@@ -6,12 +6,17 @@
 if exist('dc')
     pw_dc_raw = RemoveAutocorrelation_dc_fnirs_course...
         (dc,SD);
-    
+
     % Compute Pearson Correlation Coefficient
     [C_raw] = ...
         Compute_correlation_coefficient_fnirs_course...
         (pw_dc_raw,BadChannels);
-    
+
+    %[C_raw] = ...
+    %    Compute_correlation_coefficient_fnirs_course...
+    %    (dc,BadChannels);
+
+
     figure('Renderer', 'painters', 'Position', [50 100 1200 300])
     subplot(1,3,1)
     imagesc(C_raw(:,:,1),[-1 1]);

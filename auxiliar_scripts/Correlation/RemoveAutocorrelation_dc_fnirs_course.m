@@ -1,4 +1,4 @@
-function[dc_w] = RemoveAutocorrelation_dc_fnirs_course(dc,SD)
+function[dc_w, P_all] = RemoveAutocorrelation_dc_fnirs_course(dc,SD)
 % Removes autocorrelation from Resting State Data
 % with prehitenning methodology.
 %
@@ -23,7 +23,7 @@ function[dc_w] = RemoveAutocorrelation_dc_fnirs_course(dc,SD)
 % Maximum parameter order. A conservative approach is to use more than
 % 20 seconds as upper bound.
 Pmax = round(20*SD.f);
-
+P_all = [];
 % Whitenned data
 dc_w = nan*zeros(size(dc));
 
@@ -76,10 +76,11 @@ for Hb=1:2
             
             % Save OptimalP for double checking
             SD.Optimal_P(Nchannel,Hb) = OptimalP;
-            
+            P_all = [P_all, OptimalP];
         end
         
     end
+  
     
 end
 

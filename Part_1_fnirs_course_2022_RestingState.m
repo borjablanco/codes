@@ -58,9 +58,54 @@ Phys_data = hmrBandpassFilt...
 dc = dc(200:end-200,:,:);
 Phys_data = Phys_data(200:end-200,:);
 
+fc_hbo = corr(squeeze(dc(:,:,1)));
+
 % Remove Autocorrelation 
-pw_dc = RemoveAutocorrelation_dc_fnirs_course...
+[pw_dc, P_all] = RemoveAutocorrelation_dc_fnirs_course...
     (dc,SD);
+
+% Plot autocorrelation function before and after PW
+figure
+data_autocorr = xcorr(squeeze(pw_dc(:,1,1)), 'coeff');
+plot(data_autocorr(2339:end))
+hold on
+data_hbo = xcorr(squeeze(dc(:,1,1)), 'coeff');
+plot(data_hbo(2417:end))
+legend('pw', 'hbo')
+fc_hbo_aut = corr(squeeze(pw_dc(:,:,1)));
+
+% Plot connectivity matrices after PW
+figure
+subplot(131)
+imagesc(fc_hbo, [-1 1])
+subplot(132)
+imagesc(fc_hbo_aut, [-1 1])
+subplot(133)
+imagesc(fc_hbo-fc_hbo_aut, [-1 1])
+colormap jet
+
+% Plot PSD of data
+figure
+subplot(131)
+[pxx1,f] = pwelch(squeeze(dc(:,:,1)),[],[],[],SD.f);
+plot(f,10*log10(pxx1))
+xlabel('Frequency (Hz)')
+ylabel('PSD (dB/Hz)')
+xlim([0 1])
+subplot(132)
+[pxx2,f] = pwelch(squeeze(pw_dc(:,:,1)),[],[],[],SD.f);
+plot(f,10*log10(pxx2))
+xlabel('Frequency (Hz)')
+ylabel('PSD (dB/Hz)')
+xlim([0 1])
+subplot(133)
+plot(f,10*log10(mean(pxx1,2)))
+hold on
+plot(f,10*log10(mean(pxx2,2)))
+xlim([0 1])
+xlabel('Frequency (Hz)')
+ylabel('PSD (dB/Hz)')
+legend('hbo', 'hbo_pw', 'interpreter', 'none')
 
 % Compute Pearson Correlation Coefficient
 CorrMatrix = ...
@@ -72,8 +117,10 @@ plot_seed_based_sphere_style_fnirs_course...
     (CorrMatrix(:,:,3),BadChannels,[-1 1]);
 
 
-
-
+% QUESTIONS
+% Why data is not white after prewhitening? figure 1
+% Connectivity matrices very similar before and after pw. figure 2
+% Why hbo and hbr same order?
 
 % Save Data
 %  save('Data_for_Part_II',...
